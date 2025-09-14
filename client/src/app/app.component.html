@@ -1,0 +1,20 @@
+<mat-toolbar color="primary" *ngIf="isLoggedIn">
+  <span>🧠 Word Memorization Trainer</span>
+  <span class="spacer"></span>
+  <nav>
+    <a mat-button routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+    <a mat-button routerLink="/wordbooks" routerLinkActive="active">词书管理</a>
+    <a mat-button routerLink="/words" routerLinkActive="active">Words</a>
+    <a mat-button routerLink="/training" routerLinkActive="active">Training</a>
+    <a mat-button routerLink="/error-training" routerLinkActive="active">Error Training</a>
+    <a mat-button routerLink="/analysis" routerLinkActive="active">Analysis</a>
+  </nav>
+  <div class="user-info">
+    <span>欢迎，{{ currentUser?.username }}</span>
+    <button mat-button (click)="logout()">登出</button>
+  </div>
+</mat-toolbar>
+
+<main class="main-content">
+  <router-outlet></router-outlet>
+</main>

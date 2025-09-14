@@ -1,0 +1,103 @@
+<div class="analysis-container">
+  <h1>📊 Learning Analysis</h1>
+
+  <mat-tab-group>
+    <!-- Overview Tab -->
+    <mat-tab label="Overview">
+      <div class="tab-content">
+        <!-- Time Period Selector -->
+        <mat-card class="period-selector">
+          <mat-card-content>
+            <div class="period-controls">
+              <label>Analysis Period:</label>
+              <select [(ngModel)]="selectedDays" (change)="onDaysChange()">
+                <option value="7">Last 7 days</option>
+                <option value="30">Last 30 days</option>
+                <option value="90">Last 90 days</option>
+              </select>
+            </div>
+          </mat-card-content>
+        </mat-card>
+
+        <!-- Basic Stats -->
+        <mat-card class="stats-card" *ngIf="overviewData">
+          <mat-card-header>
+            <mat-card-title>Learning Statistics</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div *ngIf="loadingOverview" class="loading">
+              <mat-spinner diameter="30"></mat-spinner>
+              <p>Loading statistics...</p>
+            </div>
+            
+            <div *ngIf="!loadingOverview && overviewData" class="stats-grid">
+              <div class="stat-item">
+                <div class="stat-icon">📚</div>
+                <div class="stat-value">{{ overviewData.basicStats.total_words }}</div>
+                <div class="stat-label">Total Words</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-icon">🎯</div>
+                <div class="stat-value">{{ overviewData.basicStats.total_sessions }}</div>
+                <div class="stat-label">Training Sessions</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-icon">❌</div>
+                <div class="stat-value">{{ overviewData.basicStats.total_errors }}</div>
+                <div class="stat-label">Total Errors</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-icon">📈</div>
+                <div class="stat-value">{{ formatAccuracy(overviewData.basicStats.avg_accuracy) }}</div>
+                <div class="stat-label">Average Accuracy</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-icon">⏱️</div>
+                <div class="stat-value">{{ formatTime(overviewData.basicStats.total_time_seconds) }}</div>
+                <div class="stat-label">Total Time</div>
+              </div>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </mat-tab>
+
+    <!-- Session Analysis Tab -->
+    <mat-tab label="Session Analysis">
+      <div class="tab-content">
+        <mat-card class="session-selector">
+          <mat-card-header>
+            <mat-card-title>Select Training Session</mat-card-title>
+          </mat-card-header>
+          <mat-card-content>
+            <div *ngIf="loadingSessions" class="loading">
+              <mat-spinner diameter="30"></mat-spinner>
+              <p>Loading sessions...</p>
+            </div>
+            
+            <div *ngIf="!loadingSessions && sessions.length > 0" class="sessions-list">
+              <div *ngFor="let session of sessions" 
+                   class="session-item" 
+                   [class.selected]="selectedSession?.id === session.id"
+                   (click)="loadSessionAnalysis(session)">
+                <div class="session-info">
+                  <div class="session-name">{{ session.session_name }}</div>
+                  <div class="session-meta">
+                    {{ session.error_count || 0 }} errors • 
+                    {{ session.created_at | date:'short' }}
+                  </div>
+                </div>
+                <mat-icon>chevron_right</mat-icon>
+              </div>
+            </div>
+            
+            <div *ngIf="!loadingSessions && sessions.length === 0" class="no-data">
+              <mat-icon>info</mat-icon>
+              <p>No training sessions found</p>
+            </div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </mat-tab>
+  </mat-tab-group>
+</div>

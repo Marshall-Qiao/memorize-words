@@ -1,0 +1,197 @@
+<div class="training-container">
+  <h1>🎯 Word Training</h1>
+
+  <!-- Training Setup -->
+  <mat-card *ngIf="!isTraining" class="setup-card">
+    <mat-card-header>
+      <mat-card-title>Training Setup</mat-card-title>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="setup-form">
+        <mat-form-field appearance="outline" class="session-name">
+          <mat-label>Session Name</mat-label>
+          <input matInput [(ngModel)]="sessionName" placeholder="Enter session name...">
+        </mat-form-field>
+
+        <div class="settings-row">
+          <mat-form-field appearance="outline" class="setting-field">
+            <mat-label>Repeat Count</mat-label>
+            <input matInput type="number" [(ngModel)]="repeatCount" min="1" max="10">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="setting-field">
+            <mat-label>Interval (seconds)</mat-label>
+            <input matInput type="number" [(ngModel)]="interval" min="1" max="30">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="setting-field">
+            <mat-label>Accent</mat-label>
+            <select matNativeControl [(ngModel)]="accent">
+              <option value="us">US English</option>
+              <option value="uk">UK English</option>
+            </select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="setting-field">
+            <mat-label>Speed</mat-label>
+            <input matInput type="number" [(ngModel)]="speed" min="0.5" max="2" step="0.1">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="setting-field">
+            <mat-label>Start From Word #</mat-label>
+            <input matInput type="number" [(ngModel)]="startFrom" min="0">
+          </mat-form-field>
+        </div>
+
+        <div class="word-selection">
+          <h3>Select Words to Train</h3>
+          <div class="selection-controls">
+            <button mat-button (click)="selectAllWords()">
+              <mat-icon>select_all</mat-icon>
+              Select All
+            </button>
+            <button mat-button (click)="clearSelection()">
+              <mat-icon>clear</mat-icon>
+              Clear Selection
+            </button>
+            <span class="selection-count">{{ selectedWordIds.length }} selected</span>
+          </div>
+
+          <div class="word-grid">
+            <mat-chip 
+              *ngFor="let word of availableWords" 
+              [class.selected]="isWordSelected(word.id)"
+              (click)="toggleWordSelection(word.id)"
+              class="word-chip">
+              {{ word.word }}
+            </mat-chip>
+          </div>
+        </div>
+
+        <div class="start-training">
+          <button 
+            mat-raised-button 
+            color="primary" 
+            (click)="startTraining()"
+            [disabled]="selectedWordIds.length === 0"
+            class="start-button">
+            <mat-icon>play_arrow</mat-icon>
+            Start Training
+          </button>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Training Session -->
+  <div *ngIf="isTraining" class="training-session">
+    <!-- Progress Bar -->
+    <mat-card class="progress-card">
+      <mat-card-content>
+        <div class="progress-info">
+          <span class="progress-text">{{ getCurrentWordProgress() }}</span>
+          <span class="session-name">{{ sessionName }}</span>
+        </div>
+        <mat-progress-bar 
+          mode="determinate" 
+          [value]="getProgress()" 
+          class="progress-bar">
+        </mat-progress-bar>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Current Word -->
+    <mat-card class="word-card" *ngIf="currentWord">
+      <mat-card-content>
+        <div class="word-display">
+          <div class="word-text" [class.show-answer]="showAnswer">
+            {{ showAnswer ? currentWord.word : '?' }}
+          </div>
+          <div class="word-meta" *ngIf="showAnswer">
+            <span class="repeat-info">Repeat {{ currentRepeat + 1 }}/{{ repeatCount }}</span>
+            <span class="accent-info">{{ accent.toUpperCase() }} pronunciation</span>
+          </div>
+        </div>
+
+        <div class="word-actions">
+          <button mat-icon-button (click)="playCurrentWord()" [title]="'Play pronunciation'">
+            <mat-icon>volume_up</mat-icon>
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Input Section -->
+    <mat-card class="input-card" *ngIf="currentWord && !showAnswer">
+      <mat-card-content>
+        <mat-form-field appearance="outline" class="answer-input">
+          <mat-label>Type the word you heard</mat-label>
+          <input 
+            matInput 
+            [(ngModel)]="userInput" 
+            (keyup.enter)="checkAnswer()"
+            placeholder="Type here..."
+            autofocus>
+        </mat-form-field>
+        <button 
+          mat-raised-button 
+          color="primary" 
+          (click)="checkAnswer()"
+          [disabled]="!userInput.trim()">
+          Check Answer
+        </button>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Answer Display -->
+    <mat-card class="answer-card" *ngIf="currentWord && showAnswer">
+      <mat-card-content>
+        <div class="answer-result" [class.correct]="userInput.toLowerCase().trim() === currentWord.word.toLowerCase()">
+          <mat-icon *ngIf="userInput.toLowerCase().trim() === currentWord.word.toLowerCase()" class="result-icon correct">
+            check_circle
+          </mat-icon>
+          <mat-icon *ngIf="userInput.toLowerCase().trim() !== currentWord.word.toLowerCase()" class="result-icon incorrect">
+            cancel
+          </mat-icon>
+          <div class="result-text">
+            <div *ngIf="userInput.toLowerCase().trim() === currentWord.word.toLowerCase()" class="correct-message">
+              Correct! 🎉
+            </div>
+            <div *ngIf="userInput.toLowerCase().trim() !== currentWord.word.toLowerCase()" class="incorrect-message">
+              Incorrect. The correct answer is: <strong>{{ currentWord.word }}</strong>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Countdown -->
+    <mat-card class="countdown-card" *ngIf="countdown > 0">
+      <mat-card-content>
+        <div class="countdown-display">
+          <mat-icon>timer</mat-icon>
+          <span class="countdown-text">Next in {{ countdown }}s...</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Training Controls -->
+    <mat-card class="controls-card">
+      <mat-card-content>
+        <div class="training-controls">
+          <button 
+            mat-button 
+            (click)="isPaused ? resumeTraining() : pauseTraining()"
+            [color]="isPaused ? 'primary' : 'accent'">
+            <mat-icon>{{ isPaused ? 'play_arrow' : 'pause' }}</mat-icon>
+            {{ isPaused ? 'Resume' : 'Pause' }}
+          </button>
+          <button mat-button color="warn" (click)="stopTraining()">
+            <mat-icon>stop</mat-icon>
+            Stop Training
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

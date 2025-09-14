@@ -1,0 +1,167 @@
+.word-list-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+h1 {
+  color: #1976d2;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+.add-word-card, .controls-card, .word-list-card {
+  margin-bottom: 20px;
+}
+
+.add-word-form {
+  display: flex;
+  gap: 16px;
+  align-items: flex-end;
+  flex-wrap: wrap;
+}
+
+.word-input {
+  flex: 1;
+  min-width: 200px;
+}
+
+.controls-row {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+}
+
+.search-input {
+  flex: 1;
+  min-width: 200px;
+}
+
+.accent-select, .speed-input {
+  min-width: 120px;
+}
+
+.selection-controls {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+
+.selection-count {
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.loading-message, .no-words {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+}
+
+.loading-message mat-spinner {
+  margin-bottom: 16px;
+}
+
+.no-words mat-icon {
+  font-size: 48px;
+  width: 48px;
+  height: 48px;
+  margin-bottom: 16px;
+  color: #ccc;
+}
+
+.word-list {
+  max-height: 600px;
+  overflow-y: auto;
+}
+
+.word-item {
+  border-bottom: 1px solid #e0e0e0;
+  padding: 16px 0;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.word-item:last-child {
+  border-bottom: none;
+}
+
+.word-checkbox {
+  flex-shrink: 0;
+}
+
+.word-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.word-name {
+  font-size: 1.2rem;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+.word-meta {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.pronunciation {
+  font-style: italic;
+}
+
+.created-date {
+  color: #999;
+}
+
+.word-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.word-actions button {
+  color: #666;
+}
+
+.word-actions button:hover {
+  color: #1976d2;
+}
+
+.loading-spinner {
+  margin-left: 16px;
+}
+
+@media (max-width: 768px) {
+  .add-word-form {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .controls-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .selection-controls {
+    justify-content: center;
+  }
+  
+  .word-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+  
+  .word-actions {
+    align-self: flex-end;
+  }
+}

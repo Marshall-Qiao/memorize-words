@@ -1,0 +1,130 @@
+<div class="dashboard-container">
+  <h1>📊 Dashboard</h1>
+  
+  <div *ngIf="loading" class="loading">
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    <p>Loading dashboard data...</p>
+  </div>
+
+  <div *ngIf="error" class="error">
+    <mat-icon>error</mat-icon>
+    <p>{{ error }}</p>
+    <button mat-button color="primary" (click)="loadDashboardData()">Retry</button>
+  </div>
+
+  <div *ngIf="overviewData && !loading" class="dashboard-content">
+    <!-- Quick Stats -->
+    <div class="stats-grid">
+      <mat-card class="stat-card">
+        <mat-card-header>
+          <mat-card-title>📚 Total Words</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="stat-number">{{ overviewData.basicStats.total_words }}</div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card">
+        <mat-card-header>
+          <mat-card-title>🎯 Training Sessions</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="stat-number">{{ overviewData.basicStats.total_sessions }}</div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card">
+        <mat-card-header>
+          <mat-card-title>❌ Total Errors</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="stat-number">{{ overviewData.basicStats.total_errors }}</div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card">
+        <mat-card-header>
+          <mat-card-title>📈 Average Accuracy</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="stat-number">{{ formatAccuracy(overviewData.basicStats.avg_accuracy) }}</div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stat-card">
+        <mat-card-header>
+          <mat-card-title>⏱️ Total Time</mat-card-title>
+        </mat-card-header>
+        <mat-card-content>
+          <div class="stat-number">{{ formatTime(overviewData.basicStats.total_time_seconds) }}</div>
+        </mat-card-content>
+      </mat-card>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+      <h2>🚀 Quick Actions</h2>
+      <div class="action-buttons">
+        <button mat-raised-button color="primary" (click)="navigateToTraining()">
+          <mat-icon>play_arrow</mat-icon>
+          Start Training
+        </button>
+        <button mat-raised-button color="accent" (click)="navigateToErrorTraining()">
+          <mat-icon>error</mat-icon>
+          Error Training
+        </button>
+        <button mat-raised-button (click)="navigateToWords()">
+          <mat-icon>library_books</mat-icon>
+          Manage Words
+        </button>
+        <button mat-raised-button (click)="navigateToAnalysis()">
+          <mat-icon>analytics</mat-icon>
+          View Analysis
+        </button>
+      </div>
+    </div>
+
+    <!-- Error Types Distribution -->
+    <div class="error-types" *ngIf="overviewData.errorTypes.length > 0">
+      <h2>📊 Error Types Distribution</h2>
+      <div class="error-types-grid">
+        <mat-card *ngFor="let errorType of overviewData.errorTypes" class="error-type-card">
+          <mat-card-content>
+            <div class="error-type-name">{{ errorType.error_type | titlecase }}</div>
+            <div class="error-type-count">{{ errorType.count }} errors</div>
+            <div class="error-type-percentage">{{ errorType.percentage }}%</div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+
+    <!-- Top Error Words -->
+    <div class="top-errors" *ngIf="overviewData.topErrorWords.length > 0">
+      <h2>🔥 Most Challenging Words</h2>
+      <div class="top-errors-list">
+        <mat-card *ngFor="let word of overviewData.topErrorWords.slice(0, 5)" class="error-word-card">
+          <mat-card-content>
+            <div class="word-name">{{ word.word }}</div>
+            <div class="error-count">{{ word.error_count }} errors</div>
+            <div class="error-percentage">{{ word.error_percentage }}% of total</div>
+          </mat-card-content>
+        </mat-card>
+      </div>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="recent-activity" *ngIf="overviewData.dailyProgress.length > 0">
+      <h2>📅 Recent Activity (Last 7 Days)</h2>
+      <div class="activity-chart">
+        <div *ngFor="let day of overviewData.dailyProgress.slice(0, 7)" class="activity-day">
+          <div class="day-name">{{ day.date | date:'EEE' }}</div>
+          <div class="day-stats">
+            <div class="sessions">{{ day.sessions_count }} sessions</div>
+            <div class="errors">{{ day.errors_count }} errors</div>
+            <div class="accuracy">{{ formatAccuracy(day.avg_accuracy) }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
